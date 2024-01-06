@@ -23,6 +23,16 @@
 // dot product of nv_size
 #define THRESHOLD 0.5
 
+// each row should have NV_SIZE 1s or 0s at random
+// plus the catagory
+char *gen_row(void) {
+
+}
+
+void gen_training(void) {
+
+}
+
 typedef struct conn_matrix {
         int m;
         int n;
@@ -104,6 +114,9 @@ void randomize_matrix(conn_matrix *m) {
 }
 
 int main(void) {
+}
+
+void test(void) {
         conn_matrix *a_1 = calloc(1, sizeof(conn_matrix));
         a_1->m = A_I;
         a_1->n = NV_SIZE;
