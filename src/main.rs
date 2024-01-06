@@ -1,13 +1,17 @@
 mod matrix;
 use matrix::*;
 
-fn main() {
-    let retina: NeuronVector = vec![false; 10];
-    let projection_area: NeuronVector = vec![true; 10];
-    let association_area: NeuronVector = vec![false; 10];
-    let responses: NeuronVector = vec![false; 10];
-    dbg!(&retina);
-    let retina_to_projection_area = ConnectionMatrix::new(10, 10);
-    apply_connections(retina_to_projection_area, projection_area);
+// run the model
+fn perceive_once() {}
 
-}
+// perceive_once
+// if correct, increase connection weights by small amount * rand
+// if incorrect, decrease connection weights by small amount * rand
+fn train_once() {}
+
+// call train_once for each data point & score
+fn train() {}
+
+
+// run the full 2-layer perceptron
+fn main() {}

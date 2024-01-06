@@ -81,7 +81,7 @@ pub fn nv_row_dot(row : &[f64], v : &[bool]) -> Option<f64> {
 }
 
 pub fn activation(strength: f64) -> bool {
-    return true
+    return strength != 0.;
 }
 
 // multiply v x a
@@ -90,12 +90,53 @@ pub fn apply_connections(a: ConnectionMatrix, v: NeuronVector) -> Option<NeuronV
     let mut res = Vec::<bool>::with_capacity(a.m);
     for row in a.rows() {
         let dot = nv_row_dot(&row, &v);
-        dbg!(&dot);
-        let res = activation(dot);
-        dbg!(&res);
+        res.push(activation(dot?));
 
     }
     Some(res)
 }
 
 
+#[cfg(test)]
+mod tests {
+use super::*;
+    #[test]
+    fn zero_vec_gives_zero_dot() {
+        let v: NeuronVector = vec![false; 10];
+        let m = ConnectionMatrix::new(10, 10);
+        let result = apply_connections(m, v);
+        assert!(result == Some(vec![false; 10]));
+    }
+    #[test]
+    fn nonzero_vec_gives_nonzero_dot() {
+        let v: NeuronVector = vec![true; 10];
+        let m= ConnectionMatrix::new(10, 10);
+        let result = apply_connections(m, v);
+        // technically incorrect
+        assert!(result != Some(vec![false; 10]));
+    }
+    #[test]
+    fn get_rows_works() {
+        let mut m = ConnectionMatrix::new(3, 3);
+        for i in 0..3*3 {
+            m.array[i] = i as f64;
+        }
+        assert!(&m.rows()[0][..] == &[0f64, 1f64, 2f64]);
+    }
+    #[test]
+    fn get_cols_works() {
+        let mut m = ConnectionMatrix::new(3, 3);
+        for i in 0..3*3 {
+            m.array[i] = i as f64;
+        }
+        assert!(&m.cols()[0][..] == &[0f64, 3f64, 6f64]);
+    }
+    #[test]
+    fn indexing_works() {
+        let mut m = ConnectionMatrix::new(3, 3);
+        for i in 0..3*3 {
+            m.array[i] = i as f64;
+        }
+        assert!(m[1][1] == 4.);
+    }
+}
