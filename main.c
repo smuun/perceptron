@@ -5,7 +5,6 @@
 #include <fcntl.h>
 #include <limits.h>
 
-#define THRESHOLD 0.5
 
 // LATER change this so that each 'bool' is sizeof float
 // then I can just & nv with row of matrix to get dot product in one operation
@@ -20,6 +19,9 @@
 #define A_I NV_SIZE
 // A_I and A_II (same size)
 #define A_II A_I
+// activation step function
+// dot product of nv_size
+#define THRESHOLD 0.5
 
 typedef struct conn_matrix {
         int m;
@@ -37,8 +39,9 @@ void fail(void) {
 	exit(1);
 }
 
-bool activation(float f) {
-        if (f > THRESHOLD){ return true; };
+// factor is required to adjust threshold for number of elements in dot product
+bool activation(float value, int factor) {
+        if (value > THRESHOLD * factor){ return true; };
         return false;
 }
 
@@ -57,36 +60,37 @@ float dot(neuron_v *nv, float *conn_row) {
 
 // apply conns to a nv and return the result as an array of floats
 // of size conns.m
-float *apply_conns(conn_matrix *c, neuron_v *nv) {
-        float *ret = malloc(c->m * sizeof(float));
+bool *apply_conns(conn_matrix *c, neuron_v *nv) {
+        bool *ret = malloc(c->m * sizeof(float));
         for (int i = 0; i < c->m; i++) {
-                ret[i] = dot(nv, &(c->arr[c->n * i]));
+                ret[i] = activation(dot(nv, &(c->arr[c->n * i])), NV_SIZE);
         }
         return ret;
 }
 
 void print_matrix(conn_matrix *m) {
-        printf("m=%i x n=%i matrix\n", m->m, m->n);
+        fprintf(stderr, "m=%i x n=%i matrix\n", m->m, m->n);
         const int num_cols = m->n;
         for (int i = 0; i < m->m; i++){
-                printf("\t");
+                fprintf(stderr, "\t");
                 for (int j = 0; j < m->n; j++){
-                        printf("%i%i: %.3f  ", i, j, m->arr[i * num_cols + j]);
+                        fprintf(stderr, "%i%i: %.3f  ", i, j, m->arr[i * num_cols + j]);
                 }
-                printf("\n");
+                fprintf(stderr, "\n");
         }
 }
 
 void print_nv(neuron_v *nv) {
-        printf("l=%i neuron vector\n", nv->l);
-        printf("\t");
+        fprintf(stderr, "l=%i neuron vector\n", nv->l);
+        fprintf(stderr, "\t");
         for (int i = 0; i < nv->l; i++){
-                printf("%i: %i  ", i, nv->v[i]);
+                fprintf(stderr, "%i: %i  ", i, nv->v[i]);
         }
-        printf("\n");
+        fprintf(stderr, "\n");
 }
 
 // initialize each cell with a random float value between 0 exclusive and 1 inclusive
+// TODO exclude 0
 void randomize_matrix(conn_matrix *m) {
 	int rand = open("/dev/urandom", O_RDONLY);
 	if (rand < 0) { fail(); }
@@ -106,20 +110,20 @@ int main(void) {
 
         neuron_v *retina = calloc(1, sizeof(neuron_v));
         retina->l = NV_SIZE;
-        retina->v[0] = true;
-        retina->v[1] = false;
-        retina->v[2] = true;
+        for (int i = 0; i < NV_SIZE; i++){
+                retina->v[i] = true;
+        }
 
         randomize_matrix(a_1);
         print_matrix(a_1);
         print_nv(retina);
 
-        float *res = apply_conns(a_1, retina);
-        printf("res  ");
+        bool *res = apply_conns(a_1, retina);
+        fprintf(stderr, "res  ");
         for (int i = 0; i < NV_SIZE; i++){
-                printf("%f ", res[i]);
+                fprintf(stderr, "%i ", res[i]);
         }
-        printf("\n");
+        fprintf(stderr, "\n");
 
         free(res);
         free(a_1);
