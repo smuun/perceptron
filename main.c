@@ -23,16 +23,6 @@
 // dot product of nv_size
 #define THRESHOLD 0.5
 
-// each row should have NV_SIZE 1s or 0s at random
-// plus the catagory
-char *gen_row(void) {
-
-}
-
-void gen_training(void) {
-
-}
-
 typedef struct conn_matrix {
         int m;
         int n;
@@ -43,6 +33,57 @@ typedef struct neuron_v {
         int l;
 	bool v[NV_SIZE];
 } neuron_v;
+void test(void);
+void print_nv(neuron_v *nv);
+void print_matrix(conn_matrix *m);
+bool *apply_conns(conn_matrix *c, neuron_v *nv);
+float dot(neuron_v *nv, float *conn_row);
+void fail(void);
+void randomize_matrix(conn_matrix *m);
+void gen_training(void);
+char *gen_row(void);
+// each row should have NV_SIZE 1s or 0s at random
+// plus the catagory
+
+
+int main(void) {
+	test();
+}
+
+void test(void) {
+        conn_matrix *a_1 = calloc(1, sizeof(conn_matrix));
+        a_1->m = A_I;
+        a_1->n = NV_SIZE;
+
+        neuron_v *retina = calloc(1, sizeof(neuron_v));
+        retina->l = NV_SIZE;
+        for (int i = 0; i < NV_SIZE; i++){
+                retina->v[i] = true;
+        }
+
+        randomize_matrix(a_1);
+        print_matrix(a_1);
+        print_nv(retina);
+
+        bool *res = apply_conns(a_1, retina);
+        fprintf(stderr, "res  ");
+        for (int i = 0; i < NV_SIZE; i++){
+                fprintf(stderr, "%i ", res[i]);
+        }
+        fprintf(stderr, "\n");
+
+        free(res);
+        free(a_1);
+        free(retina);
+}
+
+char *gen_row(void) {
+
+}
+
+void gen_training(void) {
+
+}
 
 void fail(void) {
 	perror("exiting");
@@ -113,32 +154,3 @@ void randomize_matrix(conn_matrix *m) {
         }
 }
 
-int main(void) {
-}
-
-void test(void) {
-        conn_matrix *a_1 = calloc(1, sizeof(conn_matrix));
-        a_1->m = A_I;
-        a_1->n = NV_SIZE;
-
-        neuron_v *retina = calloc(1, sizeof(neuron_v));
-        retina->l = NV_SIZE;
-        for (int i = 0; i < NV_SIZE; i++){
-                retina->v[i] = true;
-        }
-
-        randomize_matrix(a_1);
-        print_matrix(a_1);
-        print_nv(retina);
-
-        bool *res = apply_conns(a_1, retina);
-        fprintf(stderr, "res  ");
-        for (int i = 0; i < NV_SIZE; i++){
-                fprintf(stderr, "%i ", res[i]);
-        }
-        fprintf(stderr, "\n");
-
-        free(res);
-        free(a_1);
-        free(retina);
-}
